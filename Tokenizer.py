@@ -1,38 +1,16 @@
-import urllib.request
-import re
+from importlib.metadata import version
+import tiktoken
 
-url = ("https://raw.githubusercontent.com/rasbt/"
- "LLMs-from-scratch/main/ch02/01_main-chapter-code/"
- "the-verdict.txt")
+print("tiktoken version:", version("tiktoken"))
 
-file_path = "the-verdict.txt"
+tokenizer = tiktoken.get_encoding("gpt2")
 
-urllib.request.urlretrieve(url, file_path)
+text = ("Akwirw ier")
 
-with open("the-verdict.txt", "r", encoding="utf-8") as f:
-    raw_text = f.read()
+integers = tokenizer.encode(text, allowed_special={"<|endoftext|>"})
 
-print("Total number of characters:", len(raw_text))
-print(raw_text[:99])
+print(integers)
 
-preprocessed = re.split(r'([,.:;?_!"()\']|--|\s)', raw_text)
+strings = tokenizer.decode(integers)
 
-
-preprocessed = [item.strip() for item in preprocessed if item.strip() ]
-
-preprocessed = sorted(set(preprocessed))
-
-vocab_size = len(preprocessed)
-
-print(vocab_size)
-
-vocab = {token:integer for integer, token in enumerate(preprocessed)}
-
-
-for i, item in enumerate(vocab.items()):
-    print(item)
-    if i >= 50:
-        break
-
-
-
+print(strings)
