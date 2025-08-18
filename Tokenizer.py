@@ -17,8 +17,22 @@ print(raw_text[:99])
 
 preprocessed = re.split(r'([,.:;?_!"()\']|--|\s)', raw_text)
 
-print(preprocessed)
 
-[for i in pre]
+preprocessed = [item.strip() for item in preprocessed if item.strip() ]
+
+preprocessed = sorted(set(preprocessed))
+
+vocab_size = len(preprocessed)
+
+print(vocab_size)
+
+vocab = {token:integer for integer, token in enumerate(preprocessed)}
+
+
+for i, item in enumerate(vocab.items()):
+    print(item)
+    if i >= 50:
+        break
+
 
 
