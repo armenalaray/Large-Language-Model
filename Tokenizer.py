@@ -1,4 +1,5 @@
 import urllib.request
+import re
 
 url = ("https://raw.githubusercontent.com/rasbt/"
  "LLMs-from-scratch/main/ch02/01_main-chapter-code/"
@@ -13,4 +14,11 @@ with open("the-verdict.txt", "r", encoding="utf-8") as f:
 
 print("Total number of characters:", len(raw_text))
 print(raw_text[:99])
+
+preprocessed = re.split(r'([,.:;?_!"()\']|--|\s)', raw_text)
+
+print(preprocessed)
+
+[for i in pre]
+
 
