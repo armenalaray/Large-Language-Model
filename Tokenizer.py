@@ -5,12 +5,19 @@ print("tiktoken version:", version("tiktoken"))
 
 tokenizer = tiktoken.get_encoding("gpt2")
 
-text = ("Akwirw ier")
+with open("the-verdict.txt", "r", encoding="utf-8") as f:
+    raw_text = f.read()
 
-integers = tokenizer.encode(text, allowed_special={"<|endoftext|>"})
+enc_text = tokenizer.encode(raw_text)
 
-print(integers)
+print(len(enc_text))
 
-strings = tokenizer.decode(integers)
+enc_sample = enc_text[50:]
 
-print(strings)
+context_size = 4
+
+for i in range(1,context_size+1):
+    context = enc_sample[:i]
+    desired = enc_sample[i]
+
+    print(context, "----->", desired)
