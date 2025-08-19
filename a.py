@@ -117,3 +117,70 @@ for i in range(1,context_size+1):
     print(context, "----->", desired)
 
 
+
+"""
+attn_weights_2_tmp = attn_scores_2 / attn_scores_2.sum()
+print("NORMALIZED W:",attn_weights_2_tmp)
+print("NORMALIZED W SUM:",attn_weights_2_tmp.sum())
+
+#dan 1
+#a valores grandes les da mucha importancia y a valores pequeños les da menos importancia
+#nunca son negativos siempre son positivos
+#los esta mapeando al lado positivo de menor a mayor creciendo exponencialmente!
+
+def softmaxNaive(x):
+    return torch.exp(x) / torch.exp(x).sum(dim=0)
+
+attn_weights_2 = softmaxNaive(attn_scores_2)
+print("NORMALIZED W:",attn_weights_2)
+print("NORMALIZED W SUM:",attn_weights_2.sum())
+"""
+
+
+
+#################################################
+
+inputs = torch.tensor(
+ [
+    [0.43, 0.15, 0.89], # Your (x^1)
+    [0.55, 0.87, 0.66], # journey (x^2)
+    [0.57, 0.85, 0.64], # starts (x^3)
+    [0.22, 0.58, 0.33], # with (x^4)
+    [0.77, 0.25, 0.10], # one (x^5)
+    [0.05, 0.80, 0.55]] # step (x^6)
+)
+
+query = inputs[1]
+
+
+attn_scores_2 = torch.empty(inputs.shape[0])
+
+print("UNINITIALIZED W:",attn_scores_2)
+
+for i, x_i in enumerate(inputs):
+    attn_scores_2[i] = torch.dot(x_i, query)
+
+print("INITIALIZED W:",attn_scores_2)
+
+attn_weights_2 = torch.softmax(attn_scores_2, dim=0)
+print("NORMALIZED W:",attn_weights_2)
+print("NORMALIZED W SUM:",attn_weights_2.sum())
+
+print(query.shape)
+
+context_vec_2 = torch.zeros(query.shape)
+
+print(context_vec_2)
+
+for i, x_i in enumerate(inputs):
+    context_vec_2 += attn_weights_2[i] * x_i
+
+print(context_vec_2)
+
+#############################################################
+#symetric matrix
+for i, x_i in enumerate(inputs):
+    for j, x_j in enumerate(inputs):
+        attn_scores[i, j] = torch.dot(x_i, x_j)
+
+
