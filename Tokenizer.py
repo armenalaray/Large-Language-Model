@@ -106,10 +106,32 @@ attn_scores = inputs @ inputs.T
 
 print("INITIALIZED W:\n", attn_scores)
 
+#6*6
 attn_weights = torch.softmax(attn_scores, dim=-1)
 
 print("ATENTION W:\n", attn_weights)
 
 print("ATTENTION SUM:\n",attn_weights.sum(dim=-1))
+
+print("\n")
+
+for w, i in zip(attn_weights, inputs):
+    print(w, i)
+
+print(inputs.T) 
+
+print("\n")
+
+print(attn_weights.T) 
+
+print("\n")
+
+#es una combinacion lineal de estos vectores
+all_context_vecs = attn_weights @ inputs
+all_context_vecs = inputs.T @ attn_weights.T
+
+#3*6
+print(all_context_vecs)
+
 
 
