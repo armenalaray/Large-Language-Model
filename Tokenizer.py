@@ -84,6 +84,8 @@ input_embeddings = token_embeddings + pos_embeddings
 
 print(input_embeddings.shape)
 
+#esta madre no es ortogonal!
+
 inputs = torch.tensor(
  [
     [0.43, 0.15, 0.89], # Your (x^1)
@@ -99,7 +101,15 @@ attn_scores = torch.empty(inputs.shape[0], inputs.shape[0])
 
 print("UNINITIALIZED W:\n",attn_scores)
 
+#6*6
 attn_scores = inputs @ inputs.T
 
-print("INITIALIZED W:\n",attn_scores)
+print("INITIALIZED W:\n", attn_scores)
+
+attn_weights = torch.softmax(attn_scores, dim=-1)
+
+print("ATENTION W:\n", attn_weights)
+
+print("ATTENTION SUM:\n",attn_weights.sum(dim=-1))
+
 
