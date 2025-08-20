@@ -49,32 +49,86 @@ attn_scores = queries @ keys.T
 
 print(attn_scores)
 
-attn_scores = attn_scores / keys.shape[-1] ** 0.5
-
-attn_weights = torch.softmax(attn_scores, dim=-1)
-
-print("ATTN WEIGHTS:\n",attn_weights)
-
-#print(attn_weights.sum(dim=-1))
-
 context_length = attn_scores.shape[0]
 
-mask_simple = torch.tril(torch.ones(context_length, context_length))
+mask = torch.triu(torch.ones(context_length, context_length), diagonal=1)
 
-print("MASK:\n",mask_simple)
+#print(mask.bool())
+#print(type(torch.inf))
 
-#hadamard product
-mask_simple = attn_weights*mask_simple
+masked = attn_scores.masked_fill(mask.bool(), -torch.inf)
 
-print("MASKED SIMPLE:\n", mask_simple)
+print(masked)
 
-row_sums = mask_simple.sum(dim=-1, keepdim=True)
+masked = masked / keys.shape[-1] ** 0.5
 
-masked_simple_norm = mask_simple / row_sums
+attn_weights = torch.softmax(masked, dim=-1)
 
-print("MASKED SIMPLE NORM:\n", masked_simple_norm)
+print(attn_weights)
 
-print(masked_simple_norm.sum(dim=-1))
+#during training se apagan
+
+#y en prediccion se prenden
+
+torch.manual_seed(123)
+dropout = torch.nn.Dropout(0.5)
+#example = torch.ones(6,6)
+#print(dropout(example))
+print(dropout(attn_weights))
+
+batch = torch.stack((inputs, inputs), dim=0)
+
+
+class CausalAttention(nn.Module):
+    
+    def __init__(self, d_in, d_out, context_length, dropout, qkv_bias=False):
+
+        super().__init__()
+        self.d_out = d_out
+        
+        self.W_query = nn.Linear(d_in, d_out, bias=qkv_bias)
+        self.W_key = nn.Linear(d_in, d_out, bias=qkv_bias)
+        self.W_value = nn.Linear(d_in, d_out, bias=qkv_bias)
+
+        self.dropout = nn.Dropout(dropout)
+
+        self.register_buffer('mask', torch.triu(torch.ones(context_length, context_length), diagonal=1))
+
+
+
+    def forward(self, x):
+        b, num_tokens, d_in = x.shape
+        keys = self.W_key(x)
+        queries = self.W_query(x)
+        values = self.W_value(x)
+        attn_scores = queries @ keys.transpose(1,2)
+        attn_scores.masked_fill_(self.mask.bool()[:num_tokens, :num_tokens], -torch.inf)
+        attn_scores = attn_scores / keys.shape[-1] ** 0.5
+        attn_weights = torch.softmax(attn_scores, dim=-1)
+        attn_weights = self.dropout(attn_weights)        
+        context_vectors = attn_weights @ values
+        return context_vectors
+
+
+torch.manual_seed(123)
+
+context_length = batch.shape[1]
+
+ca = CausalAttention(d_in, d_out, context_length, 0.0)
+
+context_vecs = ca(batch)
+
+print(context_vecs)
+
+
+
+
+
+
+
+
+
+
 
 
 

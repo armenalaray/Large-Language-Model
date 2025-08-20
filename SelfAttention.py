@@ -66,3 +66,80 @@ class SelfAttention_v1(nn.Module):
 torch.manual_seed(123)
 sa_v1 = SelfAttention_v1(d_in, d_out)
 #print(sa_v1(inputs))
+
+
+############################################################################################
+
+
+
+attn_scores = attn_scores / keys.shape[-1] ** 0.5
+
+attn_weights = torch.softmax(attn_scores, dim=-1)
+
+print("ATTN WEIGHTS:\n",attn_weights)
+
+#print(attn_weights.sum(dim=-1))
+
+context_length = attn_scores.shape[0]
+
+mask_simple = torch.tril(torch.ones(context_length, context_length))
+
+print("MASK:\n",mask_simple)
+
+#hadamard product
+mask_simple = attn_weights*mask_simple
+
+print("MASKED SIMPLE:\n", mask_simple)
+
+row_sums = mask_simple.sum(dim=-1, keepdim=True)
+
+masked_simple_norm = mask_simple / row_sums
+
+print("MASKED SIMPLE NORM:\n", masked_simple_norm)
+
+print(masked_simple_norm.sum(dim=-1))
+
+
+
+"""
+# x     W
+#6*3 X 3*2
+#6*2
+#2*6*3 X 3*2
+#estas combinando linealmente las rows de la matrix W
+#la bachita te dice las combinaciones!
+
+b, num_tokens, d_in = batch.shape
+
+keys = ca.W_key(batch)
+queries = ca.W_query(batch)
+values = ca.W_value(batch)
+
+attn_scores = queries @ keys.transpose(1,2)
+
+print(mask.bool())
+print(mask.bool()[:num_tokens, :num_tokens])
+
+print(attn_scores.masked_fill_(mask.bool()[:num_tokens, :num_tokens], -torch.inf))
+
+attn_scores = attn_scores / keys.shape[-1] ** 0.5
+
+print(attn_scores)
+
+attn_weights = torch.softmax(attn_scores, dim=-1)
+
+print(attn_weights)
+
+attn_weights = dropout(attn_weights)
+
+print(attn_weights)
+print(values)
+
+#2* 6*6 X 2* 6*2
+context_vectors = attn_weights @ values
+
+print("CONTEXT VECTORS:\n",context_vectors)
+
+"""
+
+
