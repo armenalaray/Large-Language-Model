@@ -6,7 +6,7 @@
         {
             "label": "build program",
             "type": "shell",
-            "command": "C:/Alejandro/LLM/build.ps1",
+            "command": "C:/Alejandro/LLM/build.bat",
             "presentation": {"echo": true, "reveal": "always", "focus": false, "panel": "shared", "showReuseMessage": false, "clear": true},
             "group": {"kind": "build", "isDefault": true},
         }

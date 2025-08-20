@@ -84,7 +84,7 @@ input_embeddings = token_embeddings + pos_embeddings
 
 print(input_embeddings.shape)
 
-#esta madre no es ortogonal!
+#################################################
 
 inputs = torch.tensor(
  [
@@ -96,42 +96,42 @@ inputs = torch.tensor(
     [0.05, 0.80, 0.55]] # step (x^6)
 )
 
-#esta solo se fija en la dim 0
-attn_scores = torch.empty(inputs.shape[0], inputs.shape[0])
+x_2 = inputs[1]
 
-print("UNINITIALIZED W:\n",attn_scores)
+d_in = inputs.shape[1]
+d_out = 2
 
-#6*6
-attn_scores = inputs @ inputs.T
+torch.manual_seed(123)
+W_query = torch.nn.Parameter(torch.rand(d_in, d_out), requires_grad=False)
+W_key = torch.nn.Parameter(torch.rand(d_in, d_out), requires_grad=False)
+W_value = torch.nn.Parameter(torch.rand(d_in, d_out), requires_grad=False)
 
-print("INITIALIZED W:\n", attn_scores)
+#1*2
+query_2 = x_2 @ W_query
 
-#6*6
-attn_weights = torch.softmax(attn_scores, dim=-1)
+keys = inputs @ W_key
+values = inputs @ W_value
 
-print("ATENTION W:\n", attn_weights)
+print("KEYS:\n",keys)
+print("VALUES:\n",values)
 
-print("ATTENTION SUM:\n",attn_weights.sum(dim=-1))
+attn_score_2 = query_2 @ keys.T
 
-print("\n")
+print("ATTN SCORES:\n", attn_score_2)
 
-for w, i in zip(attn_weights, inputs):
-    print(w, i)
+d_k = keys.shape[-1]
 
-print(inputs.T) 
+#producto punto es la magnitud del vector y su direccional
+#si attn_score_2 es muy negativo las derivadas van a ser 0
+#attn_weights_2 = torch.softmax(attn_score_2, dim=-1)
 
-print("\n")
+attn_weights_2 = torch.softmax(attn_score_2 / d_k ** 0.5, dim=-1)
 
-print(attn_weights.T) 
+print("ATTN WEIGHTS:\n",attn_weights_2)
 
-print("\n")
+context_vec_2 = attn_weights_2 @ values
 
-#es una combinacion lineal de estos vectores
-all_context_vecs = attn_weights @ inputs
-all_context_vecs = inputs.T @ attn_weights.T
-
-#3*6
-print(all_context_vecs)
+print("CONTEXT_VEC:\n",context_vec_2)
 
 
 
