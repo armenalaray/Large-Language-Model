@@ -76,7 +76,6 @@ dropout = torch.nn.Dropout(0.5)
 #print(dropout(example))
 print(dropout(attn_weights))
 
-batch = torch.stack((inputs, inputs), dim=0)
 
 
 class CausalAttention(nn.Module):
@@ -98,27 +97,45 @@ class CausalAttention(nn.Module):
 
     def forward(self, x):
         b, num_tokens, d_in = x.shape
+
         keys = self.W_key(x)
         queries = self.W_query(x)
         values = self.W_value(x)
+        
         attn_scores = queries @ keys.transpose(1,2)
+
+        print(self.mask.bool()[:num_tokens, :num_tokens])
+
         attn_scores.masked_fill_(self.mask.bool()[:num_tokens, :num_tokens], -torch.inf)
+
+        print(attn_scores)
+
         attn_scores = attn_scores / keys.shape[-1] ** 0.5
+
         attn_weights = torch.softmax(attn_scores, dim=-1)
-        attn_weights = self.dropout(attn_weights)        
+
+        print(attn_weights)
+
+        attn_weights = self.dropout(attn_weights)    
+
+        print(attn_weights)
+
         context_vectors = attn_weights @ values
+        
+        print(context_vectors)
+
         return context_vectors
 
+batch = torch.stack((inputs, inputs), dim=0)
 
 torch.manual_seed(123)
 
 context_length = batch.shape[1]
 
-ca = CausalAttention(d_in, d_out, context_length, 0.0)
+ca = CausalAttention(d_in, d_out, context_length, 0.5)
 
-context_vecs = ca(batch)
+ca(batch)
 
-print(context_vecs)
 
 
 
