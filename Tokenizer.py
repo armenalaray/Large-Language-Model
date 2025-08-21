@@ -43,6 +43,8 @@ class MultiHeadAttention(nn.Module):
         queries = queries.transpose(1,2)
         values = values.transpose(1,2)
 
+        #batches * num_tokens * head_dim
+
         attn_scores = queries @ keys.transpose(2,3)
 
         mask_bool = self.mask.bool()[:num_tokens, :num_tokens]
@@ -57,6 +59,7 @@ class MultiHeadAttention(nn.Module):
 
         context_vec = (attn_weights @ values).transpose(1,2)
 
+        #aqui se stackean
         context_vec = context_vec.contiguous().view(b, num_tokens, self.d_out)
 
         context_vec = self.out_proj(context_vec)
@@ -79,6 +82,9 @@ torch.manual_seed(123)
 batch_size, context_length, d_in = batch.shape
 
 d_out = 200
+
+#se ajusta la data a usarse por el modelo y despues se regresa en lista!
+#puedes verlo como tu quieras pero ahi lo tienes que ver 
 
 #se stackean todas las cabezas en el mismo context vector eso es multithreading!
 mha = MultiHeadAttention(d_in, d_out, context_length, 0.5, num_heads=10)
