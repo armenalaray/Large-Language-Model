@@ -278,8 +278,6 @@ class MultiHeadAttentionWrapper(nn.Module):
                 [CausalAttention(d_in, d_out, context_length, dropout, qkv_bias) for _ in range(num_heads)]
             )
         
-        
-
     def forward(self, x):
         a = [head(x) for head in self.heads]
         print(a)

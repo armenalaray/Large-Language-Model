@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import traceback
 
 class MultiHeadAttention(nn.Module):
     def __init__(self, d_in, d_out, context_length, dropout, num_heads, qkv_bias=False):
@@ -35,6 +36,9 @@ class MultiHeadAttention(nn.Module):
         queries = self.W_query(x)
         values = self.W_value(x)
         
+        #traceback.print_stack()
+        #breakpoint()
+
         keys = keys.view(b, num_tokens, self.num_heads, self.head_dim)
         queries = queries.view(b, num_tokens, self.num_heads, self.head_dim)
         values = values.view(b, num_tokens, self.num_heads, self.head_dim)
@@ -65,7 +69,7 @@ class MultiHeadAttention(nn.Module):
         context_vec = self.out_proj(context_vec)
 
         return context_vec
-
+"""
 inputs = torch.tensor(
  [
     [0.43, 0.15, 0.89], # Your (x^1)
@@ -94,6 +98,7 @@ print(context_vecs)
 
 print("context_vecs.shape:", context_vecs.shape)
     
+"""
 
 
 
